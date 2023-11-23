@@ -13,6 +13,7 @@ class Authenticate extends Middleware
      */
     protected array $except = [
         'auth/login',
+        'auth/register',
     ];
 
 

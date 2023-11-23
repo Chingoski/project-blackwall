@@ -26,13 +26,20 @@ class User extends BaseModel implements
     use CanResetPassword;
     use MustVerifyEmail;
 
+    protected $table = 'user';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
+        'phone_number',
+        'city_id',
+        'address',
+        'date_of_birth',
         'email',
         'password',
     ];
@@ -55,5 +62,6 @@ class User extends BaseModel implements
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'date_of_birth' => 'date',
     ];
 }
