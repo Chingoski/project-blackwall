@@ -27,4 +27,6 @@ Route::controller(AuthController::class)->prefix('auth')->group(function () {
         ->name('auth.logout');
     Route::post('/password/reset', 'passwordReset')
         ->name('auth.password.reset');
+    Route::post('/register', 'register')
+        ->name('auth.register');
 });

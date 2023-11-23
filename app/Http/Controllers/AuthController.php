@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\PasswordResetRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -28,7 +29,9 @@ class AuthController extends Controller
         return response()->json([
             'meta' => [
                 'message' => 'Success',
-                'auth_token' => $user->createToken("API TOKEN")->plainTextToken
+                'auth'    => [
+                    'token' => $user->createToken("API TOKEN")->plainTextToken,
+                ],
             ],
             'data' => $user->toArray(),
         ]);
@@ -66,6 +69,27 @@ class AuthController extends Controller
         return response()->json([
             'meta' => [
                 'message' => 'Success',
+            ],
+            'data' => $user->toArray(),
+        ]);
+    }
+
+    public function register(RegisterRequest $request): JsonResponse
+    {
+        $createData = $request->validated();
+        $createData['password'] = Hash::make($createData['password']);
+
+        /** @var User $user */
+        $user = User::query()->create($createData);
+
+        $authToken = $user->createToken('API_TOKEN')->plainTextToken;
+
+        return response()->json([
+            'meta' => [
+                'message' => 'Sucess',
+                'auth'    => [
+                    'token' => $authToken,
+                ],
             ],
             'data' => $user->toArray(),
         ]);
