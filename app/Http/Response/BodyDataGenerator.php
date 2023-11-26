@@ -14,11 +14,11 @@ class BodyDataGenerator
 {
     protected Collection|array|LengthAwarePaginator|BaseModel|null $data;
 
-    protected ?array $authBearerToken;
+    protected ?string $authBearerToken;
 
     protected ?array $metaData;
 
-    public function __construct(protected TransformerAbstract $transformer, Collection|LengthAwarePaginator|array|null $data = null, array $authBearerToken = null, array $metaData = null)
+    public function __construct(protected TransformerAbstract $transformer, BaseModel|Collection|LengthAwarePaginator|array|null $data = null, array $authBearerToken = null, array $metaData = null)
     {
         $this->data = $data;
         $this->authBearerToken = $authBearerToken;
@@ -31,7 +31,7 @@ class BodyDataGenerator
         return $this;
     }
 
-    public function setAuthBearerToken(array $authBearerToken): BodyDataGenerator
+    public function setAuthBearerToken(string $authBearerToken): BodyDataGenerator
     {
         $this->authBearerToken = $authBearerToken;
         return $this;
@@ -46,18 +46,18 @@ class BodyDataGenerator
     protected function generateMeta(): ?array
     {
         if (!isset($this->metaData) && !isset($this->authBearerToken)) {
-            return null;
+            return [];
         }
 
         $meta = [];
 
         if (isset($this->authBearerToken)) {
-            $meta['auth'] = [['token' => $this->authBearerToken]];
+            $meta['auth'] = ['token' => $this->authBearerToken];
         }
 
         return [
             ...$meta,
-            ...$this->metaData,
+            ...$this->metaData ?? [],
         ];
     }
 
@@ -79,6 +79,11 @@ class BodyDataGenerator
             $body->paginateWith(new IlluminatePaginatorAdapter($this->data));
         }
 
-        return $body->toArray();
+        $body = $body->toArray();
+        if (!isset($body['meta'])) {
+            $body['meta'] = [];
+        }
+
+        return array_merge(array_flip(['meta', 'data']), $body);
     }
 }

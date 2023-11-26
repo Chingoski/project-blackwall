@@ -5,15 +5,23 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\PasswordResetRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Response\BodyDataGenerator;
+use App\Http\Response\ResponseGenerator;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\UnauthorizedException;
 
 class AuthController extends Controller
 {
-    public function login(LoginRequest $request): JsonResponse
+    public function __construct(protected ResponseGenerator $responseGenerator)
+    {
+
+    }
+
+    public function login(LoginRequest $request): Response
     {
         $credentials = $request->validated();
 
@@ -23,75 +31,84 @@ class AuthController extends Controller
         $canLogin = $user && Hash::check($credentials['password'], $user->password);
 
         if (!$canLogin) {
-            return response()->json(['message' => 'Login failed.'], 401);
+            throw new UnauthorizedException();
         }
 
-        return response()->json([
-            'meta' => [
-                'message' => 'Success',
-                'auth'    => [
-                    'token' => $user->createToken("API TOKEN")->plainTextToken,
-                ],
-            ],
-            'data' => $user->toArray(),
-        ]);
+        $responseBody = (new BodyDataGenerator($user->getTransformer()))
+            ->setData($user)
+            ->setAuthBearerToken($user->createToken("API TOKEN")->plainTextToken)
+            ->generateBody();
+
+        return $this->responseGenerator->success($responseBody);
     }
 
-    public function logout(Request $request): JsonResponse
+    public function logout(Request $request): Response
     {
-        if (Auth::check()) {
-            /** @var User $user */
-            $user = Auth::user();
-
-            $user->currentAccessToken()->delete();
-
-            return response()->json(['message' => 'Successfully logged out.'], 200);
+        if (!Auth::check()) {
+            throw new UnauthorizedException();
         }
 
-        return response()->json(['message' => 'Invalid token'], 401);
+        /** @var User $user */
+        $user = Auth::user();
+
+        $user->currentAccessToken()->delete();
+
+        return $this->responseGenerator->noContent();
     }
 
-    public function passwordReset(PasswordResetRequest $request): JsonResponse
+    public function passwordReset(PasswordResetRequest $request): Response
     {
         $data = $request->validated();
 
+        if (!Auth::check()) {
+            throw new UnauthorizedException();
+        }
 
+        /** @var User $user */
         $user = Auth::user();
         $correctPassword = $user && Hash::check($data['current_password'], $user?->password);
 
         if (!$correctPassword) {
-            return response()->json(['message' => 'Password Reset Failed.'], 401);
+            throw new UnauthorizedException('Password Reset Failed.');
         }
 
         $user->password = Hash::make($data['new_password']);
         $user->save();
 
-        return response()->json([
-            'meta' => [
-                'message' => 'Success',
-            ],
-            'data' => $user->toArray(),
-        ]);
+        $responseBody = (new BodyDataGenerator($user->getTransformer()))->setData($user)->generateBody();
+
+        return $this->responseGenerator->success($responseBody);
     }
 
-    public function register(RegisterRequest $request): JsonResponse
+    public function register(RegisterRequest $request): Response
     {
         $createData = $request->validated();
         $createData['password'] = Hash::make($createData['password']);
 
         /** @var User $user */
-        $user = User::query()->create($createData);
+        $user = User::create($createData);
 
         $authToken = $user->createToken('API_TOKEN')->plainTextToken;
 
-        return response()->json([
-            'meta' => [
-                'message' => 'Sucess',
-                'auth'    => [
-                    'token' => $authToken,
-                ],
-            ],
-            'data' => $user->toArray(),
-        ]);
+        $responseBody = (new BodyDataGenerator($user->getTransformer()))
+            ->setData($user)
+            ->setAuthBearerToken($authToken)
+            ->generateBody();
+
+        return $this->responseGenerator->success($responseBody);
+    }
+
+    public function user(Request $request): Response
+    {
+        if (!Auth::check()) {
+            throw new UnauthorizedException();
+        }
+
+        /** @var User $user */
+        $user = Auth::user();
+
+        $responseBody = (new BodyDataGenerator($user->getTransformer()))->setData($user)->generateBody();
+
+        return $this->responseGenerator->success($responseBody);
     }
 }
