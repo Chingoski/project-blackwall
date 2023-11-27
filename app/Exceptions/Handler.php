@@ -3,9 +3,11 @@
 namespace App\Exceptions;
 
 use App\Http\Response\ResponseGenerator;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application as ApplicationAlias;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
@@ -14,6 +16,8 @@ use Illuminate\Http\Response;
 use Illuminate\Validation\UnauthorizedException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -46,6 +50,8 @@ class Handler extends ExceptionHandler
         return match (true) {
             $e instanceof UnauthorizedException => $responseGenerator->unauthorized($e->getMessage()),
             $e instanceof ValidationException => $responseGenerator->unprocessableEntity(['meta' => [], 'data' => $e->errors()]),
+            $e instanceof AuthorizationException => $responseGenerator->forbidden(),
+            $e instanceof NotFoundHttpException, $e instanceof ModelNotFoundException => $responseGenerator->notFound($e instanceof NotFoundHttpException ? $e->getMessage() : 'Model not found'),
             (config('app.env') != 'local') => $responseGenerator->serverError(),
             default => parent::render($request, $e),
         };
@@ -53,7 +59,7 @@ class Handler extends ExceptionHandler
 
     public function unauthenticated($request, AuthenticationException $exception): ApplicationAlias|Response|JsonResponse|RedirectResponse|Application|ResponseFactory
     {
-        return response(['message' => 'Unauthenticated Test'], 401);
+        throw new UnauthorizedException();
     }
 
     public function shouldReturnJson($request, Throwable $e): bool
