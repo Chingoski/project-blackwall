@@ -34,6 +34,16 @@ class ResponseGenerator
         return $this->generateJsonResponse(ResponseCodes::HTTP_INTERNAL_SERVER_ERROR, 'Something went wrong');
     }
 
+    public function forbidden(): Response
+    {
+        return $this->generateJsonResponse(ResponseCodes::HTTP_FORBIDDEN, 'Forbidden');
+    }
+
+    public function notFound(string $message = 'Not Found'): Response
+    {
+        return $this->generateJsonResponse(ResponseCodes::HTTP_NOT_FOUND, $message);
+    }
+
     protected function generateJsonResponse(int $httpCode, ?string $message = null, ?array $data = null): Response
     {
         $responseBody = match (true) {
