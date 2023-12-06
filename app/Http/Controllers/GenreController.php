@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Filters\CityFilters;
+use App\Filters\GenreFilters;
 use App\Http\Requests\City\GetCitiesRequest;
 use App\Http\Response\ResponseGenerator;
-use App\Models\City;
+use App\Models\Genre;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Response;
 
-class CityController extends Controller
+class GenreController extends Controller
 {
-    public function __construct(City $city, protected CityFilters $filterClass, ResponseGenerator $responseGenerator)
+    public function __construct(Genre $genre, protected GenreFilters $filterClass, ResponseGenerator $responseGenerator)
     {
-        parent::__construct($city, $responseGenerator);
+        parent::__construct($genre, $responseGenerator);
     }
 
     /**
