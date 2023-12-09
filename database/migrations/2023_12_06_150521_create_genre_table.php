@@ -18,6 +18,8 @@ return new class extends Migration {
             $table->softDeletes();
 
             $table->index('name');
+
+            $table->unique('name');
         });
     }
 
