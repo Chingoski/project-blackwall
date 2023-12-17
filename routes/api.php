@@ -3,7 +3,6 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\GenreController;
-use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,15 +30,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
             ->name('genres.index');
         Route::get('/{id}', 'find')
             ->name('genres.find');
-    });
-});
-
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::controller(TagController::class)->prefix('tags')->group(function () {
-        Route::get('', 'index')
-            ->name('tags.index');
-        Route::get('/{id}', 'find')
-            ->name('tags.find');
     });
 });
 

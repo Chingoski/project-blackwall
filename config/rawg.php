@@ -5,7 +5,6 @@ return [
     'host'          => 'https://api.rawg.io/api',
     'routes'        => [
         'games'  => 'games',
-        'tags'   => 'tags',
         'genres' => 'genres',
     ],
     'games_filters' => [

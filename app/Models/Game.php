@@ -25,11 +25,6 @@ class Game extends BaseModel
         return $this->belongsToMany(Genre::class, 'game_genre', 'game_id', 'genre_id');
     }
 
-    public function tags(): BelongsToMany
-    {
-        return $this->belongsToMany(Tag::class, 'game_tag', 'game_id', 'tag_id');
-    }
-
     public function platforms(): BelongsToMany
     {
         return $this->belongsToMany(Platform::class, 'game_platform', 'game_id', 'platform_id');
