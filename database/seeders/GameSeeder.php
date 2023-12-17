@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Jobs\CreateGameRelatedDataJob;
 use App\Models\Game;
-use App\Models\GamePlatform;
-use App\Models\Genre;
+use App\Models\GameGenre;
 use App\Services\RawgApiService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -18,40 +18,34 @@ class GameSeeder extends Seeder
     {
         $apiService = new RawgApiService();
         $games = $apiService->getGames();
+        $gameCreateData = [];
+        $jobData = [];
+        $next = $games['next'];
 
-        $game = $games['results'][0];
-        $gameCreateData = [
-            [
-                'name'         => $game['name'],
-                'slug'         => $game['slug'],
-                'release_date' => $game['released'],
-                'thumbnail'    => $game['background_image'],
-                'rating'       => $game['rating'],
-            ],
-        ];
-
-        $tagData = [];
-        $genreData = [];
-        $platformCreateData = [];
-
-        foreach ($game['platforms'] as $platform) {
-            $platformName = $platform['platform']['name'];
-
-            if (!str_contains($platformName, 'PlayStation 4') && !str_contains($platformName, 'PlayStation 5')){
-                continue;
+        while (!is_null($next)) {
+            foreach ($games['results'] as $game) {
+                $gameCreateData[] =
+                    [
+                        'name'         => $game['name'],
+                        'slug'         => $game['slug'],
+                        'release_date' => $game['released'],
+                        'thumbnail'    => $game['background_image'],
+                        'rating'       => $game['rating'],
+                    ];
+                $jobData[$game['name']] = [
+                    'genres'    => $game['genres'],
+                    'platforms' => $game['platforms'],
+                ];
+            }
+            Game::query()->upsert($gameCreateData, ['name'], ['name', 'rating', 'release_date', 'thumbnail']);
+            foreach ($gameCreateData as $game) {
+                CreateGameRelatedDataJob::dispatch($game['name'], $jobData[$game['name']]);
             }
 
-            $platformCreateData[] = [
-                'game_id'     => DB::raw("(select id from game where game.name = '{$game['name']}')"),
-                'platform_id' => DB::raw("(select id from platform where platform.name = '{$platformName}')"),
-                'created_at'  => now(),
-                'updated_at'  => now(),
-            ];
+            $gameCreateData = [];
+            $jobData = [];
+            $games = $apiService->getNextPage($next);
+            $next = $games['next'];
         }
-
-        Game::query()->upsert($gameCreateData, ['name'], ['name', 'rating', 'release_date', 'thumbnail']);
-        GamePlatform::query()->insert($platformCreateData);
     }
-
-
 }
