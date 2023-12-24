@@ -35,6 +35,10 @@ class Controller extends BaseController
             ->applyFilters($this->filterClass->setFilters($filters))
             ->paginate(self::PAGINATION_LIMIT);
 
+        if (isset($filters['include'])) {
+            $models->load($filters['include']);
+        }
+
         $body = (new BodyDataGenerator($this->model->getTransformer()))->setData($models)->generateBody();
 
         return $this->responseGenerator->success($body);

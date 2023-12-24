@@ -4,6 +4,7 @@ namespace App\Transformers;
 
 use App\Models\User;
 use Carbon\Carbon;
+use League\Fractal\Resource\Item;
 use League\Fractal\TransformerAbstract;
 
 class UserTransformer extends TransformerAbstract
@@ -43,6 +44,12 @@ class UserTransformer extends TransformerAbstract
             'phone_number'  => $user->phone_number,
             'address'       => $user->address,
             'date_of_birth' => Carbon::parse($user->date_of_birth)->format('m/d/Y'),
+            'city_id'       => $user->city_id,
         ];
+    }
+
+    public function includeCity(User $user): Item
+    {
+        return $this->item($user->city, new CityTransformer());
     }
 }
