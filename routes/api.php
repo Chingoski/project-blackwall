@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CityController;
+use App\Http\Controllers\GameController;
+use App\Http\Controllers\GenreController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,8 +20,26 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::controller(CityController::class)->prefix('cities')->group(function () {
         Route::get('', 'index')
             ->name('cities.index');
-        Route::get('/{city}', 'find')
+        Route::get('/{id}', 'find')
             ->name('cities.find');
+    });
+});
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::controller(GenreController::class)->prefix('genres')->group(function () {
+        Route::get('', 'index')
+            ->name('genres.index');
+        Route::get('/{id}', 'find')
+            ->name('genres.find');
+    });
+});
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::controller(GameController::class)->prefix('games')->group(function () {
+        Route::get('', 'index')
+            ->name('games.index');
+        Route::get('/{id}', 'find')
+            ->name('games.find');
     });
 });
 

@@ -5,12 +5,11 @@ return [
     'host'          => 'https://api.rawg.io/api',
     'routes'        => [
         'games'  => 'games',
-        'tags'   => 'tags',
         'genres' => 'genres',
     ],
     'games_filters' => [
         'platforms' => '18,187',
-        'ordering'  => '-released',
+        'ordering'  => '-created',
         'page_size' => 25,
     ],
 ];

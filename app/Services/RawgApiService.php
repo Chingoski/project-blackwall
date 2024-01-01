@@ -33,20 +33,6 @@ class RawgApiService
 
         return $response->json();
     }
-
-    public function getTags(?int $pageNumber = null)
-    {
-        $url = $this->generateApiUrl(config('rawg.routes.tags'), 100, $pageNumber);
-
-        $response = Http::get($url);
-
-        if (!$response->successful()) {
-            throw new UnprocessableEntityHttpException('Fetching genres failed.');
-        }
-
-        return $response->json();
-    }
-
     protected function setGamesFilters(string $url, array $filters): string
     {
         foreach ($filters as $filter => $value) {
@@ -69,6 +55,17 @@ class RawgApiService
 
         if (!$response->successful()) {
             throw new UnprocessableEntityHttpException('Fetching genres failed.');
+        }
+
+        return $response->json();
+    }
+
+    public function getNextPage(string $url)
+    {
+        $response = Http::get($url);
+
+        if (!$response->successful()) {
+            throw new UnprocessableEntityHttpException('Fetching next page failed.');
         }
 
         return $response->json();

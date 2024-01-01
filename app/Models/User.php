@@ -61,7 +61,12 @@ class User extends BaseModel implements
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-        'date_of_birth' => 'date',
+        'password'          => 'hashed',
+        'date_of_birth'     => 'date',
     ];
+
+    public function city()
+    {
+        return $this->belongsTo(City::class, 'city_id', 'id');
+    }
 }
