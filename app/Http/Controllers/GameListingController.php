@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Filters\GameFilters;
 use App\Filters\GameListingFilters;
-use App\Http\Requests\Game\GetGamesRequest;
+use App\Http\Requests\GameListing\CreateGameListingsRequest;
 use App\Http\Requests\GameListing\GetGameListingsRequest;
 use App\Http\Response\ResponseGenerator;
-use App\Models\Game;
+use App\LogicValidators\GameListing\GameListingPlatformIsCorrectLogicValidator;
 use App\Models\GameListing;
 use Illuminate\Http\Response;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -25,5 +24,18 @@ class GameListingController extends Controller
     public function index(GetGameListingsRequest $request): Response
     {
         return parent::baseIndex($request);
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function create(CreateGameListingsRequest $request): Response
+    {
+        return parent::baseCreate($request);
+    }
+
+    public function validateCreate(array $data): void
+    {
+        (new GameListingPlatformIsCorrectLogicValidator())->validateCreate($data);
     }
 }

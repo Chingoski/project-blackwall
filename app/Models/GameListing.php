@@ -14,6 +14,7 @@ class GameListing extends BaseModel
     protected $fillable = [
         'game_id',
         'owner_id',
+        'platform_id',
         'description',
         'trade_preference',
     ];

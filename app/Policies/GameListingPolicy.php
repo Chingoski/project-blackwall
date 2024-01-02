@@ -47,4 +47,9 @@ class GameListingPolicy
     {
         return $gameListing->owner_id == $user->getKey();
     }
+
+    public function delete(User $user, GameListing $gameListing): bool
+    {
+        return $gameListing->owner_id == $user->getKey();
+    }
 }
