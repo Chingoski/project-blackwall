@@ -18,6 +18,7 @@ use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -50,6 +51,7 @@ class Handler extends ExceptionHandler
         return match (true) {
             $e instanceof UnauthorizedException => $responseGenerator->unauthorized($e->getMessage()),
             $e instanceof ValidationException => $responseGenerator->unprocessableEntity(['meta' => [], 'data' => $e->errors()]),
+            $e instanceof UnprocessableEntityHttpException => $responseGenerator->unprocessableEntity(['meta' => [], 'data' => []], $e->getMessage()),
             $e instanceof AuthorizationException => $responseGenerator->forbidden(),
             $e instanceof NotFoundHttpException, $e instanceof ModelNotFoundException => $responseGenerator->notFound($e instanceof NotFoundHttpException ? $e->getMessage() : 'Model not found'),
             (config('app.env') != 'local') => $responseGenerator->serverError(),

@@ -12,6 +12,10 @@ class BaseFilters
 
     }
 
+    public function before(): void
+    {
+    }
+
     public function getFilters(): array
     {
         return $this->filters;
@@ -32,6 +36,8 @@ class BaseFilters
 
     public function applyFilters(): Builder
     {
+        $this->before();
+
         if (empty($this->filters)) {
             return $this->builder;
         }

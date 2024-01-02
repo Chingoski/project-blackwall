@@ -12,6 +12,11 @@ class ResponseGenerator
         return $this->generateJsonResponse(ResponseCodes::HTTP_OK, $message, $data);
     }
 
+    public function created(array $data, string $message = 'Created'): Response
+    {
+        return $this->generateJsonResponse(ResponseCodes::HTTP_CREATED, $message, $data);
+    }
+
     public function noContent(): Response
     {
         return $this->generateJsonResponse(ResponseCodes::HTTP_NO_CONTENT);

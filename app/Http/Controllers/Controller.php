@@ -57,4 +57,67 @@ class Controller extends BaseController
 
         return $this->responseGenerator->success($body);
     }
+
+    public function validateCreate(array $data): void
+    {
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function baseCreate(FormRequest $request): Response
+    {
+        $this->authorize('create', $this->model::class);
+
+        $createData = $request->validated();
+
+        $this->validateCreate($createData);
+
+        /** @var BaseModel $model */
+        $model = $this->model->newQuery()
+            ->create($createData)
+            ->refresh();
+
+        $body = (new BodyDataGenerator($this->model->getTransformer()))->setData($model)->generateBody();
+
+        return $this->responseGenerator->created($body);
+    }
+
+    public function validateUpdate(BaseModel $model, array $data): void
+    {
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function baseUpdate(BaseModel $model, FormRequest $request): Response
+    {
+        $this->authorize('update', $model);
+
+        $updateData = $request->validated();
+
+        $this->validateUpdate($model, $updateData);
+
+        $model->update($updateData);
+        $model->refresh();
+
+        $body = (new BodyDataGenerator($this->model->getTransformer()))->setData($model)->generateBody();
+
+        return $this->responseGenerator->success($body);
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function simpleDelete(int $id): Response
+    {
+        $model = $this->model->newQuery()
+            ->find($id);
+
+        $this->authorize('delete', $model);
+
+        $model->delete();
+
+        return $this->responseGenerator->noContent();
+    }
 }
