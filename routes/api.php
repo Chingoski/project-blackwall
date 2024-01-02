@@ -54,6 +54,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
             ->name('game_listings.create');
         Route::put('/{id}', 'update')
             ->name('game_listings.update');
+        Route::delete('/{id}', 'simpleDelete')
+            ->name('game_listings.delete');
     });
 });
 

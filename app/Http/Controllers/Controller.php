@@ -105,4 +105,19 @@ class Controller extends BaseController
 
         return $this->responseGenerator->success($body);
     }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function simpleDelete(int $id): Response
+    {
+        $model = $this->model->newQuery()
+            ->find($id);
+
+        $this->authorize('delete', $model);
+
+        $model->delete();
+
+        return $this->responseGenerator->noContent();
+    }
 }
