@@ -82,4 +82,27 @@ class Controller extends BaseController
 
         return $this->responseGenerator->created($body);
     }
+
+    public function validateUpdate(BaseModel $model, array $data): void
+    {
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function baseUpdate(BaseModel $model, FormRequest $request): Response
+    {
+        $this->authorize('update', $model);
+
+        $updateData = $request->validated();
+
+        $this->validateUpdate($model, $updateData);
+
+        $model->update($updateData);
+        $model->refresh();
+
+        $body = (new BodyDataGenerator($this->model->getTransformer()))->setData($model)->generateBody();
+
+        return $this->responseGenerator->success($body);
+    }
 }

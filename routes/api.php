@@ -52,6 +52,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
             ->name('game_listings.find');
         Route::post('', 'create')
             ->name('game_listings.create');
+        Route::put('/{id}', 'update')
+            ->name('game_listings.update');
     });
 });
 
