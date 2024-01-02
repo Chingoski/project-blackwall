@@ -4,6 +4,14 @@ namespace App\Filters;
 
 class GameFilters extends BaseFilters
 {
+    public function before(): void
+    {
+        $this->builder
+            ->whereNotNull('release_date')
+            ->where('release_date', '<', now())
+            ->orderBy('release_date', 'desc');
+    }
+
     public function search(string $search): void
     {
         $this->builder->where('name', 'ilike', "%{$search}%");
