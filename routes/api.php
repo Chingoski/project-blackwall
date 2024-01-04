@@ -17,13 +17,11 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::controller(CityController::class)->prefix('cities')->group(function () {
-        Route::get('', 'index')
-            ->name('cities.index');
-        Route::get('/{id}', 'find')
-            ->name('cities.find');
-    });
+Route::controller(CityController::class)->prefix('cities')->group(function () {
+    Route::get('', 'index')
+        ->name('cities.index');
+    Route::get('/{id}', 'find')
+        ->name('cities.find');
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {

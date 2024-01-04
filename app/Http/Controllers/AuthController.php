@@ -95,7 +95,7 @@ class AuthController extends Controller
             ->setAuthBearerToken($authToken)
             ->generateBody();
 
-        return $this->responseGenerator->success($responseBody);
+        return $this->responseGenerator->created($responseBody);
     }
 
     public function user(Request $request): Response
