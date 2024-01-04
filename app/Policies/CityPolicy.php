@@ -11,7 +11,7 @@ class CityPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function index(User $user): bool
+    public function index(?User $user): bool
     {
         return true;
     }
@@ -19,7 +19,7 @@ class CityPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function find(User $user, City $city): bool
+    public function find(?User $user, City $city): bool
     {
         return true;
     }
