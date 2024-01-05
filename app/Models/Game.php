@@ -12,6 +12,10 @@ class Game extends BaseModel
 
     protected $table = 'game';
 
+    protected $with = [
+        'genres',
+    ];
+
     protected $fillable = [
         'name',
         'slug',
