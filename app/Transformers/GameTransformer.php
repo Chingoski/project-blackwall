@@ -32,6 +32,12 @@ class GameTransformer extends TransformerAbstract
      */
     public function transform(Game $game): array
     {
+        $genresData = [];
+
+        foreach ($game->genres as $genre) {
+            $genresData[] = (new GenreTransformer())->transform($genre);
+        }
+
         return [
             'id'           => $game->getKey(),
             'name'         => $game->name,
@@ -39,6 +45,7 @@ class GameTransformer extends TransformerAbstract
             'thumbnail'    => $game->thumbnail,
             'rating'       => $game->rating,
             'release_date' => isset($game->release_date) ? Carbon::parse($game->release_date)->format('m/d/Y') : null,
+            'genres'       => $genresData,
         ];
     }
 
