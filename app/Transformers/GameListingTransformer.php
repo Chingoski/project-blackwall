@@ -28,7 +28,7 @@ class GameListingTransformer extends TransformerAbstract
     public function transform(GameListing $gameListing): array
     {
         return [
-            'id'               => $gameListing->getKey(),
+            'id'               => $gameListing->id,
             'description'      => $gameListing->description,
             'game_id'          => $gameListing->game_id,
             'game'             => (new GameTransformer())->transform($gameListing->game),
