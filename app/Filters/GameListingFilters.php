@@ -10,7 +10,8 @@ class GameListingFilters extends BaseFilters
     {
         $filters = $this->getFilters();
 
-        $this->builder->join('game', 'game_id', '=', 'game.id');
+        $this->builder->join('game', 'game_id', '=', 'game.id')
+            ->select('game_listing.*');
 
         if (!isset($filters['owner_id'])) {
             $this->builder->where('owner_id', '!=', Auth::user()->id);
