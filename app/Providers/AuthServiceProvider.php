@@ -6,10 +6,12 @@ use App\Models\City;
 use App\Models\Game;
 use App\Models\GameListing;
 use App\Models\Genre;
+use App\Models\Trade;
 use App\Policies\CityPolicy;
 use App\Policies\GameListingPolicy;
 use App\Policies\GamePolicy;
 use App\Policies\GenrePolicy;
+use App\Policies\TradePolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -24,6 +26,7 @@ class AuthServiceProvider extends ServiceProvider
         Genre::class       => GenrePolicy::class,
         Game::class        => GamePolicy::class,
         GameListing::class => GameListingPolicy::class,
+        Trade::class       => TradePolicy::class,
     ];
 
     /**
