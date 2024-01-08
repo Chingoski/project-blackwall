@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->unsignedInteger('game_listing_id');
             $table->decimal('offered_amount')->nullable();
             $table->unsignedInteger('trader_user_id');
-            $table->enum('status', [TradeStatusEnum::Pending->value, TradeStatusEnum::Accepted->value, TradeStatusEnum::Finished->value, TradeStatusEnum::Canceled->value])->default(TradeStatusEnum::Pending->value);
+            $table->enum('status', [TradeStatusEnum::Pending->value, TradeStatusEnum::Accepted->value, TradeStatusEnum::Finished->value, TradeStatusEnum::Canceled->value, TradeStatusEnum::Expired->value])->default(TradeStatusEnum::Pending->value);
             $table->boolean('owner_confirmed')->default(false);
             $table->boolean('trader_confirmed')->default(false);
             $table->timestamps();

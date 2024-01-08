@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Trade;
 
+use App\Enums\TradeStatusEnum;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -23,6 +24,10 @@ class GetTradesRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'game_listing_id' => ['required', 'integer', 'exists:game_listing,id'],
+            'trader_user_id'  => ['integer', 'exists:user,id'],
+            'status'          => ['integer', 'in:' . TradeStatusEnum::Pending->value . ',' . TradeStatusEnum::Accepted->value . ',' . TradeStatusEnum::Finished->value . ',' . TradeStatusEnum::Canceled->value . ',' . TradeStatusEnum::Expired->value],
+            'search'          => ['string'],
         ];
     }
 }

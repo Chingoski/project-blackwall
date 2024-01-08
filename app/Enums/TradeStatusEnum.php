@@ -10,6 +10,7 @@ enum TradeStatusEnum: int
     case Accepted = 1;
     case Finished = 2;
     case Canceled = 3;
+    case Expired = 4;
 
     public static function getName(int $value): int|string|null
     {

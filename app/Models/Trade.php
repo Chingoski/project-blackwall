@@ -12,6 +12,15 @@ class Trade extends BaseModel
 
     protected $table = 'trade';
 
+    protected $fillable = [
+        'game_listing_id',
+        'trader_user_id',
+        'offered_amount',
+        'status',
+        'owner_confirmed',
+        'trader_confirmed',
+    ];
+
     public function trader(): BelongsTo
     {
         return $this->belongsTo(User::class, 'trader_user_id', 'id');
