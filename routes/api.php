@@ -62,6 +62,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::controller(TradeController::class)->prefix('trades')->group(function () {
         Route::get('/', 'index')
             ->name('trades.index');
+        Route::get('/{id}', 'find')
+            ->name('trades.find');
     });
 });
 
