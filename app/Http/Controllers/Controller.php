@@ -94,7 +94,7 @@ class Controller extends BaseController
             DB::commit();
         } catch (Throwable) {
             DB::rollBack();
-            throw new UnprocessableEntityHttpException('Crating the trade has failed.');
+            throw new UnprocessableEntityHttpException('Crating the resource has failed.');
         }
         /** @var BaseModel $model */
 
@@ -109,6 +109,11 @@ class Controller extends BaseController
     {
     }
 
+
+    public function updateRelations(BaseModel $model, array $data)
+    {
+    }
+
     /**
      * @throws AuthorizationException
      */
@@ -120,8 +125,19 @@ class Controller extends BaseController
 
         $this->validateUpdate($model, $updateData);
 
-        $model->update($updateData);
-        $model->refresh();
+        try {
+            DB::beginTransaction();
+
+            $model->update($updateData);
+            $this->updateRelations($model, $updateData);
+            $model->refresh();
+
+            DB::commit();
+        } catch (Throwable) {
+            DB::rollBack();
+            throw  new UnprocessableEntityHttpException('The update has failed.');
+        }
+
 
         $body = (new BodyDataGenerator($this->model->getTransformer()))->setData($model)->generateBody();
 

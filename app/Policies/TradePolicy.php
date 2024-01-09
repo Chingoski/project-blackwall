@@ -36,4 +36,13 @@ class TradePolicy
 
         return $userId == $user->getKey();
     }
+
+    public function update(User $user, Trade $trade): bool
+    {
+        if ($trade->trader_user_id == $user->getKey()) {
+            return true;
+        }
+
+        return $trade->game_listing->owner_id == $user->getKey();
+    }
 }

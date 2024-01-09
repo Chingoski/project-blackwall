@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Filters\TradeFilters;
 use App\Http\Requests\Trade\CreateTradeRequest;
 use App\Http\Requests\Trade\GetTradesRequest;
+use App\Http\Requests\Trade\UpdateTradeRequest;
 use App\Http\Response\BodyDataGenerator;
 use App\Http\Response\ResponseGenerator;
 use App\LogicValidators\Trade\CheckIfGameListingIsAvailableForTradeLogicValidator;
 use App\LogicValidators\Trade\CheckIfSameGameAsGameListingIsOfferedLogicValidator;
+use App\LogicValidators\Trade\CheckIfTradeCanBeUpdatedLogicValidator;
 use App\LogicValidators\Trade\CheckIfUserAlreadyRequestedTradeLogicValidator;
 use App\LogicValidators\Trade\UserCanSearchTradesForGameListingLogicValidator;
 use App\Models\BaseModel;
@@ -80,22 +82,30 @@ class TradeController extends Controller
     /** @var Trade $model */
     public function createRelations(BaseModel $model, array $data): void
     {
-        if (!isset($data['games']) || empty($data['games'])) {
-            return;
-        }
+        $model->createOfferedGames($data);
+    }
 
-        $createData = [];
+    /**
+     * @throws AuthorizationException
+     */
+    public function update(int $id, UpdateTradeRequest $request): Response
+    {
+        $trade = Trade::query()->findOrFail($id);
 
-        foreach ($data['games'] as $game) {
-            $createData[] = [
-                'game_id'     => $game['game_id'],
-                'platform_id' => $game['platform_id'],
-                'trade_id'    => $model->getKey(),
-                'created_at'  => now(),
-                'updated_at'  => now(),
-            ];
-        }
+        return parent::baseUpdate($trade, $request);
+    }
 
-        OfferedTradeGame::query()->insert($createData);
+    /** @var Trade $model */
+    public function validateUpdate(BaseModel $model, array $data): void
+    {
+        (new CheckIfTradeCanBeUpdatedLogicValidator($model))->validate();
+        (new CheckIfSameGameAsGameListingIsOfferedLogicValidator($model->game_listing, $data))->validate();
+    }
+
+    /** @var Trade $model */
+    public function updateRelations(BaseModel $model, array $data)
+    {
+        $model->deleteOfferedGames();
+        $model->createOfferedGames($data);
     }
 }

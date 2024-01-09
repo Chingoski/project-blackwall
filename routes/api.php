@@ -66,6 +66,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
             ->name('trades.find');
         Route::post('/', 'create')
             ->name('trades.create');
+        Route::put('/{id}', 'update')
+            ->name('trades.update');
     });
 });
 

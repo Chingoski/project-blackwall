@@ -45,4 +45,32 @@ class Trade extends BaseModel
     {
         return $this->hasMany(OfferedTradeGame::class, 'trade_id', 'id');
     }
+
+    public function createOfferedGames(array $data): static
+    {
+        if (!isset($data['games']) || empty($data['games'])) {
+            return $this;
+        }
+
+        $createData = [];
+
+        foreach ($data['games'] as $game) {
+            $createData[] = [
+                'game_id'     => $game['game_id'],
+                'platform_id' => $game['platform_id'],
+                'trade_id'    => $this->getKey(),
+                'created_at'  => now(),
+                'updated_at'  => now(),
+            ];
+        }
+
+        OfferedTradeGame::query()->insert($createData);
+
+        return $this;
+    }
+
+    public function deleteOfferedGames(): void
+    {
+        OfferedTradeGame::query()->where('trade_id', '=', $this->getKey())->delete();
+    }
 }
