@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
-use App\Models\GameListing;
 use App\Models\Trade;
 use App\Models\User;
+use Illuminate\Support\Facades\Request;
 
 class TradePolicy
 {
@@ -28,5 +28,12 @@ class TradePolicy
         }
 
         return $trade->game_listing->owner_id == $user->getKey();
+    }
+
+    public function create(User $user): bool
+    {
+        $userId = Request::get('trader_user_id');
+
+        return $userId == $user->getKey();
     }
 }

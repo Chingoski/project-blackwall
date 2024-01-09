@@ -2,6 +2,8 @@
 
 namespace App\Filters;
 
+use App\Enums\TradeStatusEnum;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Auth;
 
 class GameListingFilters extends BaseFilters
@@ -19,6 +21,10 @@ class GameListingFilters extends BaseFilters
 
         if (!isset($filters['order_by'])) {
             $this->builder->orderBy('game_listing.created_at', 'desc');
+        }
+
+        if (!isset($filters['available'])) {
+            $this->available(true);
         }
 
         parent::before();
@@ -53,8 +59,29 @@ class GameListingFilters extends BaseFilters
         };
     }
 
-    public function tradePreference(string $tradePreference)
+    public function tradePreference(string $tradePreference): void
     {
         $this->builder->where('trade_preference', '=', $tradePreference);
+    }
+
+    public function available(bool $available): void
+    {
+        if (!$available) {
+            return;
+        }
+
+        $this->builder->whereNotExists(function (Builder $query) {
+            $query->selectRaw('1')
+                ->from('trade')
+                ->whereColumn('game_listing_id', 'game_listing.id')
+                ->whereNull('deleted_at')
+                ->where(function (Builder $query) {
+                    $query->whereIn('trade.status', [TradeStatusEnum::Accepted->value, TradeStatusEnum::Finished->value])
+                        ->orWhere(function (Builder $query) {
+                            $query->where('status', '=', TradeStatusEnum::Pending->value)
+                                ->where('trade.trader_user_id', '=', Auth::user()->getKey());
+                        });
+                });
+        });
     }
 }

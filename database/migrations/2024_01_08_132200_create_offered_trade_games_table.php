@@ -14,14 +14,17 @@ return new class extends Migration {
             $table->id();
             $table->unsignedInteger('game_id');
             $table->unsignedInteger('trade_id');
+            $table->unsignedInteger('platform_id');
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('game_id')->references('id')->on('game');
             $table->foreign('trade_id')->references('id')->on('trade');
+            $table->foreign('platform_id')->references('id')->on('platform');
 
             $table->index('game_id');
             $table->index('trade_id');
+            $table->index('platform_id');
         });
     }
 
@@ -30,6 +33,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('offered_trade_games');
+        Schema::dropIfExists('offered_trade_game');
     }
 };

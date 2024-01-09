@@ -35,4 +35,9 @@ class TradeFilters extends BaseFilters
     {
         $this->builder->where('game_listing_id', '=', $gameListingId);
     }
+
+    public function status(int $status): void
+    {
+        $this->builder->where('status', '=', $status);
+    }
 }
