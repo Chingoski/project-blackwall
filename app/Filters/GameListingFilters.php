@@ -23,7 +23,7 @@ class GameListingFilters extends BaseFilters
             $this->builder->orderBy('game_listing.created_at', 'desc');
         }
 
-        if (!isset($filters['available'])) {
+        if (!isset($filters['available']) && !isset($filters['owner_id'])) {
             $this->available(true);
         }
 

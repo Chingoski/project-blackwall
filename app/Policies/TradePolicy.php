@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\TradeStatusEnum;
 use App\Models\Trade;
 use App\Models\User;
 use Illuminate\Support\Facades\Request;
@@ -44,5 +45,10 @@ class TradePolicy
         }
 
         return $trade->game_listing->owner_id == $user->getKey();
+    }
+
+    public function accept(User $user, Trade $trade): bool
+    {
+        return $trade->game_listing->owner_id == $user->getKey() && $trade->status == TradeStatusEnum::Pending->value;
     }
 }

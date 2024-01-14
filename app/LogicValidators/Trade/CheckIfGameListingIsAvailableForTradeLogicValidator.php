@@ -18,7 +18,7 @@ class CheckIfGameListingIsAvailableForTradeLogicValidator
     {
         $isGameListingAvailable = Trade::query()
             ->where('game_listing_id', '=', $this->gameListing->getKey())
-            ->whereIn('status', [TradeStatusEnum::Accepted->value, TradeStatusEnum::Accepted->value])
+            ->whereIn('status', [TradeStatusEnum::Accepted->value, TradeStatusEnum::Finished->value])
             ->doesntExist();
 
         if ($isGameListingAvailable) {

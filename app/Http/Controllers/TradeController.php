@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TradeStatusEnum;
 use App\Filters\TradeFilters;
 use App\Http\Requests\Trade\CreateTradeRequest;
 use App\Http\Requests\Trade\GetTradesRequest;
@@ -21,7 +22,10 @@ use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Throwable;
 
 class TradeController extends Controller
 {
@@ -103,9 +107,42 @@ class TradeController extends Controller
     }
 
     /** @var Trade $model */
-    public function updateRelations(BaseModel $model, array $data)
+    public function updateRelations(BaseModel $model, array $data): void
     {
         $model->deleteOfferedGames();
         $model->createOfferedGames($data);
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function accept(int $tradeId, Request $request): Response
+    {
+        /** @var Trade $trade */
+        $trade = Trade::query()->findOrFail($tradeId);
+
+        $this->authorize('accept', $trade);
+
+        try {
+            DB::beginTransaction();
+
+            $trade->update([
+                'status' => TradeStatusEnum::Accepted->value,
+            ]);
+
+            Trade::query()
+                ->where('game_listing_id', '=', $trade->game_listing_id)
+                ->where('trade.id', '!=', $trade->getKey())
+                ->delete();
+
+            DB::commit();
+        } catch (Throwable) {
+            DB::rollBack();
+            throw new UnprocessableEntityHttpException('The trade accept has failed.');
+        }
+
+        $body = (new BodyDataGenerator($this->model->getTransformer()))->setData($trade)->generateBody();
+
+        return $this->responseGenerator->success($body);
     }
 }
