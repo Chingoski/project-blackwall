@@ -4,6 +4,7 @@ namespace App\Filters;
 
 use App\Enums\TradeStatusEnum;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 
 class GameListingFilters extends BaseFilters
@@ -23,7 +24,7 @@ class GameListingFilters extends BaseFilters
             $this->builder->orderBy('game_listing.created_at', 'desc');
         }
 
-        if (!isset($filters['available']) && !isset($filters['owner_id'])) {
+        if (!isset($filters['available']) && !isset($filters['owner_id']) && !Arr::hasAny($filters, ['finished', 'accepted'])) {
             $this->available(true);
         }
 
@@ -111,6 +112,21 @@ class GameListingFilters extends BaseFilters
                 ->from('trade')
                 ->whereColumn('trade.game_listing_id', 'game_listing.id')
                 ->where('trade.status', '=', TradeStatusEnum::Finished->value)
+                ->whereNull('deleted_at');
+        });
+    }
+
+    public function canceled(bool $canceled): void
+    {
+        if (!$canceled) {
+            return;
+        }
+
+        $this->builder->whereExists(function (Builder $query) {
+            $query->selectRaw('1')
+                ->from('trade')
+                ->whereColumn('trade.game_listing_id', 'game_listing.id')
+                ->where('trade.status', '=', TradeStatusEnum::Canceled->value)
                 ->whereNull('deleted_at');
         });
     }

@@ -11,6 +11,7 @@ use App\Http\Response\BodyDataGenerator;
 use App\Http\Response\ResponseGenerator;
 use App\LogicValidators\Trade\CheckIfGameListingIsAvailableForTradeLogicValidator;
 use App\LogicValidators\Trade\CheckIfSameGameAsGameListingIsOfferedLogicValidator;
+use App\LogicValidators\Trade\CheckIfTradeCanBeCanceledLogicValidator;
 use App\LogicValidators\Trade\CheckIfTradeCanBeUpdatedLogicValidator;
 use App\LogicValidators\Trade\CheckIfTradeIsAlreadyConfirmedByUserLogicValidator;
 use App\LogicValidators\Trade\CheckIfUserAlreadyRequestedTradeLogicValidator;
@@ -180,6 +181,34 @@ class TradeController extends Controller
 
         $trade = $this->resolveConfirm($user, $trade);
         $trade->save();
+
+        $body = (new BodyDataGenerator($this->model->getTransformer()))->setData($trade)->generateBody();
+
+        return $this->responseGenerator->success($body);
+    }
+
+    public function validateCancel(Trade $trade): void
+    {
+        (new CheckIfTradeCanBeCanceledLogicValidator($trade))->validate();
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function cancel(int $tradeId, Request $request): Response
+    {
+        /** @var Trade $trade */
+        $trade = Trade::query()->findOrFail($tradeId);
+
+        $this->authorize('confirm', $trade);
+
+        $this->validateCancel($trade);
+
+        $trade->update([
+            'owner_confirmed'  => false,
+            'trader_confirmed' => false,
+            'status'           => TradeStatusEnum::Canceled->value,
+        ]);
 
         $body = (new BodyDataGenerator($this->model->getTransformer()))->setData($trade)->generateBody();
 

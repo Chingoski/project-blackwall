@@ -24,11 +24,11 @@ class TradePolicy
 
     public function find(User $user, Trade $trade): bool
     {
-        if ($trade->trader_user_id == $user->getKey()) {
+        if ($trade->belongsToTrader($user)) {
             return true;
         }
 
-        return $trade->game_listing->owner_id == $user->getKey();
+        return $trade->belongsToOwner($user);
     }
 
     public function create(User $user): bool
@@ -40,24 +40,25 @@ class TradePolicy
 
     public function update(User $user, Trade $trade): bool
     {
-        if ($trade->trader_user_id == $user->getKey()) {
+        if ($trade->belongsToTrader($user)) {
             return true;
         }
 
-        return $trade->game_listing->owner_id == $user->getKey();
+        return $trade->belongsToOwner($user);
     }
 
     public function accept(User $user, Trade $trade): bool
     {
-        return $trade->game_listing->owner_id == $user->getKey() && $trade->status == TradeStatusEnum::Pending->value;
+        return $trade->belongsToOwner($user) && $trade->status == TradeStatusEnum::Pending->value;
     }
 
     public function confirm(User $user, Trade $trade): bool
     {
-        if ($trade->status != TradeStatusEnum::Accepted->value) {
-            return false;
-        }
+        return $trade->belongsToTrader($user) || $trade->belongsToOwner($user);
+    }
 
-        return $trade->trader_user_id == $user->getKey() || $trade->game_listing->owner_id == $user->getKey();
+    public function cancel(User $user, Trade $trade): bool
+    {
+        return $trade->belongsToTrader($user) || $trade->belongsToOwner($user);
     }
 }

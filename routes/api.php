@@ -72,6 +72,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
             ->name('trades.accept');
         Route::put('/confirm/{id}', 'confirm')
             ->name('trades.confirm');
+        Route::put('/cancel/{id}', 'cancel')
+            ->name('trades.cancel');
     });
 });
 
