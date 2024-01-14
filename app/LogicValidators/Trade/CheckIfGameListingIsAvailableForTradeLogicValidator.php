@@ -5,7 +5,6 @@ namespace App\LogicValidators\Trade;
 use App\Enums\TradeStatusEnum;
 use App\Models\GameListing;
 use App\Models\Trade;
-use App\Models\User;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class CheckIfGameListingIsAvailableForTradeLogicValidator

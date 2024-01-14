@@ -12,6 +12,7 @@ use App\Http\Response\ResponseGenerator;
 use App\LogicValidators\Trade\CheckIfGameListingIsAvailableForTradeLogicValidator;
 use App\LogicValidators\Trade\CheckIfSameGameAsGameListingIsOfferedLogicValidator;
 use App\LogicValidators\Trade\CheckIfTradeCanBeUpdatedLogicValidator;
+use App\LogicValidators\Trade\CheckIfTradeIsAlreadyConfirmedByUserLogicValidator;
 use App\LogicValidators\Trade\CheckIfUserAlreadyRequestedTradeLogicValidator;
 use App\LogicValidators\Trade\UserCanSearchTradesForGameListingLogicValidator;
 use App\Models\BaseModel;
@@ -140,6 +141,45 @@ class TradeController extends Controller
             DB::rollBack();
             throw new UnprocessableEntityHttpException('The trade accept has failed.');
         }
+
+        $body = (new BodyDataGenerator($this->model->getTransformer()))->setData($trade)->generateBody();
+
+        return $this->responseGenerator->success($body);
+    }
+
+    public function validateConfirm(User $authUser, Trade $trade): void
+    {
+        (new CheckIfTradeIsAlreadyConfirmedByUserLogicValidator($authUser, $trade))->validate();
+    }
+
+    public function resolveConfirm(User $user, Trade $trade): Trade
+    {
+        $trade->belongsToTrader($user) ? $trade->trader_confirmed = true
+            : $trade->owner_confirmed = true;
+
+        if ($trade->confirmed) {
+            $trade->status = TradeStatusEnum::Finished->value;
+        }
+
+        return $trade;
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function confirm(int $tradeId, Request $request): Response
+    {
+        /** @var Trade $trade */
+        $trade = Trade::query()->findOrFail($tradeId);
+        /** @var User $user */
+        $user = Auth::user();
+
+        $this->authorize('confirm', $trade);
+
+        $this->validateConfirm($user, $trade);
+
+        $trade = $this->resolveConfirm($user, $trade);
+        $trade->save();
 
         $body = (new BodyDataGenerator($this->model->getTransformer()))->setData($trade)->generateBody();
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -72,5 +73,25 @@ class Trade extends BaseModel
     public function deleteOfferedGames(): void
     {
         OfferedTradeGame::query()->where('trade_id', '=', $this->getKey())->delete();
+    }
+
+    public function belongsToOwner(User $user): bool
+    {
+        return $this->game_listing->owner_id == $user->getKey();
+    }
+
+    public function belongsToTrader(User $user): bool
+    {
+        return $this->trader_user_id == $user->getKey();
+    }
+
+    /**
+     * Get the user's first name.
+     */
+    protected function confirmed(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value, $attributes) => $attributes['owner_confirmed'] && $attributes['trader_confirmed'],
+        );
     }
 }

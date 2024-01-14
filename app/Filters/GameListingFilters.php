@@ -84,4 +84,34 @@ class GameListingFilters extends BaseFilters
                 });
         });
     }
+
+    public function accepted(bool $accepted): void
+    {
+        if (!$accepted) {
+            return;
+        }
+
+        $this->builder->whereExists(function (Builder $query) {
+            $query->selectRaw('1')
+                ->from('trade')
+                ->whereColumn('trade.game_listing_id', 'game_listing.id')
+                ->where('trade.status', '=', TradeStatusEnum::Accepted->value)
+                ->whereNull('deleted_at');
+        });
+    }
+
+    public function finished(bool $finished): void
+    {
+        if (!$finished) {
+            return;
+        }
+
+        $this->builder->whereExists(function (Builder $query) {
+            $query->selectRaw('1')
+                ->from('trade')
+                ->whereColumn('trade.game_listing_id', 'game_listing.id')
+                ->where('trade.status', '=', TradeStatusEnum::Finished->value)
+                ->whereNull('deleted_at');
+        });
+    }
 }

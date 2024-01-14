@@ -51,4 +51,13 @@ class TradePolicy
     {
         return $trade->game_listing->owner_id == $user->getKey() && $trade->status == TradeStatusEnum::Pending->value;
     }
+
+    public function confirm(User $user, Trade $trade): bool
+    {
+        if ($trade->status != TradeStatusEnum::Accepted->value) {
+            return false;
+        }
+
+        return $trade->trader_user_id == $user->getKey() || $trade->game_listing->owner_id == $user->getKey();
+    }
 }
