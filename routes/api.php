@@ -5,6 +5,7 @@ use App\Http\Controllers\CityController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\GameListingController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\TradeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -54,6 +55,25 @@ Route::middleware(['auth:sanctum'])->group(function () {
             ->name('game_listings.update');
         Route::delete('/{id}', 'simpleDelete')
             ->name('game_listings.delete');
+    });
+});
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::controller(TradeController::class)->prefix('trades')->group(function () {
+        Route::get('/', 'index')
+            ->name('trades.index');
+        Route::get('/{id}', 'find')
+            ->name('trades.find');
+        Route::post('/', 'create')
+            ->name('trades.create');
+        Route::put('/{id}', 'update')
+            ->name('trades.update');
+        Route::put('/accept/{id}', 'accept')
+            ->name('trades.accept');
+        Route::put('/confirm/{id}', 'confirm')
+            ->name('trades.confirm');
+        Route::put('/cancel/{id}', 'cancel')
+            ->name('trades.cancel');
     });
 });
 

@@ -11,6 +11,9 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Throwable;
 
 class Controller extends BaseController
 {
@@ -62,6 +65,14 @@ class Controller extends BaseController
     {
     }
 
+    public function createRelations(BaseModel $model, array $data)
+    {
+    }
+
+    public function afterCreateEventsAndJobs(BaseModel $model)
+    {
+    }
+
     /**
      * @throws AuthorizationException
      */
@@ -73,10 +84,21 @@ class Controller extends BaseController
 
         $this->validateCreate($createData);
 
+        try {
+            DB::beginTransaction();
+            $model = $this->model->newQuery()
+                ->create($createData)
+                ->refresh();
+
+            $this->createRelations($model, $createData);
+            DB::commit();
+        } catch (Throwable) {
+            DB::rollBack();
+            throw new UnprocessableEntityHttpException('Crating the resource has failed.');
+        }
         /** @var BaseModel $model */
-        $model = $this->model->newQuery()
-            ->create($createData)
-            ->refresh();
+
+        $this->afterCreateEventsAndJobs($model);
 
         $body = (new BodyDataGenerator($this->model->getTransformer()))->setData($model)->generateBody();
 
@@ -84,6 +106,11 @@ class Controller extends BaseController
     }
 
     public function validateUpdate(BaseModel $model, array $data): void
+    {
+    }
+
+
+    public function updateRelations(BaseModel $model, array $data)
     {
     }
 
@@ -98,8 +125,19 @@ class Controller extends BaseController
 
         $this->validateUpdate($model, $updateData);
 
-        $model->update($updateData);
-        $model->refresh();
+        try {
+            DB::beginTransaction();
+
+            $model->update($updateData);
+            $this->updateRelations($model, $updateData);
+            $model->refresh();
+
+            DB::commit();
+        } catch (Throwable) {
+            DB::rollBack();
+            throw  new UnprocessableEntityHttpException('The update has failed.');
+        }
+
 
         $body = (new BodyDataGenerator($this->model->getTransformer()))->setData($model)->generateBody();
 
