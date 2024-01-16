@@ -45,11 +45,13 @@ class TradeController extends Controller
 
         $filters = $request->validated();
 
-        $gameListing = GameListing::query()->findOrFail($filters['game_listing_id']);
+        if (isset($filters['game_listing_id'])) {
+            $gameListing = GameListing::query()->findOrFail();
 
-        (new UserCanSearchTradesForGameListingLogicValidator())->validate(Auth::user(), $gameListing);
-        if ($gameListing->owner_id != Auth::user()->getKey()) {
-            $filters['trader_user_id'] = Auth::user()->getKey();
+            (new UserCanSearchTradesForGameListingLogicValidator())->validate(Auth::user(), $gameListing);
+            if ($gameListing->owner_id != Auth::user()->getKey()) {
+                $filters['trader_user_id'] = Auth::user()->getKey();
+            }
         }
 
         $models = $this->model->newQuery()

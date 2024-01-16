@@ -24,8 +24,9 @@ class GetTradesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'game_listing_id' => ['required', 'integer', 'exists:game_listing,id'],
-            'trader_user_id'  => ['integer', 'exists:user,id'],
+            'game_listing_id' => ['integer', 'exists:game_listing,id'],
+            'trader_user_id'  => ['required_without:owner_id', 'integer', 'exists:user,id'],
+            'owner_id'        => ['required_without:trader_user_id', 'integer', 'exists:user,id'],
             'status'          => ['integer', 'in:' . TradeStatusEnum::Pending->value . ',' . TradeStatusEnum::Accepted->value . ',' . TradeStatusEnum::Finished->value . ',' . TradeStatusEnum::Canceled->value . ',' . TradeStatusEnum::Expired->value],
             'search'          => ['string'],
         ];

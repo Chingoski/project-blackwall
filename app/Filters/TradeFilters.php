@@ -2,7 +2,8 @@
 
 namespace App\Filters;
 
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class TradeFilters extends BaseFilters
 {
@@ -26,10 +27,18 @@ class TradeFilters extends BaseFilters
         });
     }
 
-    public function trader_user_id(int $traderUserId): void
+    public function traderUserId(int $traderUserId): void
     {
         $this->builder->where('trader_user_id', '=', $traderUserId);
     }
+
+    public function ownerId(int $ownerId): void
+    {
+        $this->builder->join('game_listing', 'trade.game_listing_id', '=', 'game_listing.id')
+            ->where('game_listing.owner_id', '=', $ownerId)
+            ->when($ownerId != Auth::user()->getKey(), fn(Builder $query) => $query->where('trader_user_id', '=', Auth::user()->getKey()));
+    }
+
 
     public function gameListingId(int $gameListingId): void
     {

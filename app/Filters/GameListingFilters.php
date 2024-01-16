@@ -14,7 +14,16 @@ class GameListingFilters extends BaseFilters
         $filters = $this->getFilters();
 
         $this->builder->join('game', 'game_id', '=', 'game.id')
-            ->select('game_listing.*');
+            ->select('game_listing.*')
+            ->addSelect([
+                'pending_trade_offers_count' => function (Builder $query) {
+                    $query->selectRaw('coalesce(count(trade.id), 0)')
+                        ->from('trade')
+                        ->whereColumn('game_listing_id', 'game_listing.id')
+                        ->where('trade.status', '=', TradeStatusEnum::Pending->value)
+                        ->whereNull('trade.deleted_at');
+                },
+            ]);
 
         if (!isset($filters['owner_id'])) {
             $this->builder->where('owner_id', '!=', Auth::user()->id);

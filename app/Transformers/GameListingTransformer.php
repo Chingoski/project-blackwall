@@ -28,15 +28,16 @@ class GameListingTransformer extends TransformerAbstract
     public function transform(GameListing $gameListing): array
     {
         return [
-            'id'               => $gameListing->getKey(),
-            'description'      => $gameListing->description,
-            'game_id'          => $gameListing->game_id,
-            'game'             => (new GameTransformer())->transform($gameListing->game),
-            'owner_id'         => $gameListing->owner_id,
-            'owner'            => (new UserTransformer())->transform($gameListing->owner),
-            'trade_preference' => $gameListing->trade_preference,
-            'platform_id'      => $gameListing->platform_id,
-            'platform'         => (new PlatformTransformer())->transform($gameListing->platform),
+            'id'                         => $gameListing->getKey(),
+            'description'                => $gameListing->description,
+            'game_id'                    => $gameListing->game_id,
+            'game'                       => (new GameTransformer())->transform($gameListing->game),
+            'owner_id'                   => $gameListing->owner_id,
+            'owner'                      => (new UserTransformer())->transform($gameListing->owner),
+            'trade_preference'           => $gameListing->trade_preference,
+            'platform_id'                => $gameListing->platform_id,
+            'platform'                   => (new PlatformTransformer())->transform($gameListing->platform),
+            'pending_trade_offers_count' => $gameListing->pending_trade_offers_count ?? 0,
         ];
     }
 }
