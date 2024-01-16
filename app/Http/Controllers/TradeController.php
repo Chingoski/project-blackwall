@@ -18,7 +18,6 @@ use App\LogicValidators\Trade\CheckIfUserAlreadyRequestedTradeLogicValidator;
 use App\LogicValidators\Trade\UserCanSearchTradesForGameListingLogicValidator;
 use App\Models\BaseModel;
 use App\Models\GameListing;
-use App\Models\OfferedTradeGame;
 use App\Models\Trade;
 use App\Models\User;
 use Illuminate\Http\Response;
