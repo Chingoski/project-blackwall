@@ -6,6 +6,7 @@ use App\Http\Controllers\GameController;
 use App\Http\Controllers\GameListingController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\TradeController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -74,6 +75,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
             ->name('trades.confirm');
         Route::put('/cancel/{id}', 'cancel')
             ->name('trades.cancel');
+    });
+});
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::controller(UserController::class)->prefix('users')->group(function () {
+        Route::get('/{id}', 'find')
+            ->name('users.find');
     });
 });
 
