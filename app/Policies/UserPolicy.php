@@ -10,4 +10,9 @@ class UserPolicy
     {
         return true;
     }
+
+    public function update(User $authUser, User $user): bool
+    {
+        return $authUser->getKey() == $user->getKey();
+    }
 }
