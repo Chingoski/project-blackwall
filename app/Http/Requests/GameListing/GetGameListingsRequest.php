@@ -31,6 +31,10 @@ class GetGameListingsRequest extends FormRequest
             'order_by'         => ['string', 'in:alphabetical,chronological'],
             'trade_preference' => ['string', 'in:' . TradePreferenceEnum::Any->value . ',' . TradePreferenceEnum::Cash->value . ',' . TradePreferenceEnum::GameTitlesOnly->value],
             'page'             => ['integer'],
+            'finished'         => ['boolean'],
+            'ongoing'          => ['boolean'],
+            'accepted'         => ['boolean'],
+            'available'        => ['booelan'],
         ];
     }
 }

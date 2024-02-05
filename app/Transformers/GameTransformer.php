@@ -38,7 +38,7 @@ class GameTransformer extends TransformerAbstract
             $genresData[] = (new GenreTransformer())->transform($genre);
         }
 
-        return [
+        $data = [
             'id'           => $game->getKey(),
             'name'         => $game->name,
             'slug'         => $game->slug,
@@ -47,6 +47,16 @@ class GameTransformer extends TransformerAbstract
             'release_date' => isset($game->release_date) ? Carbon::parse($game->release_date)->format('m/d/Y') : null,
             'genres'       => $genresData,
         ];
+
+        if (isset($game->platform_id) && isset($game->platform_name)) {
+            $data['platform'] = [
+                'id'   => $game->platform_id,
+                'name' => $game->platform_name,
+                'slug' => $game->platform_slug ?? null,
+            ];
+        }
+
+        return $data;
     }
 
     public function includeGenres(Game $game): Collection

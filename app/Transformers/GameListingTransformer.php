@@ -3,6 +3,8 @@
 namespace App\Transformers;
 
 use App\Models\GameListing;
+use App\Models\Trade;
+use League\Fractal\Resource\Item;
 use League\Fractal\TransformerAbstract;
 
 class GameListingTransformer extends TransformerAbstract
@@ -22,7 +24,7 @@ class GameListingTransformer extends TransformerAbstract
      * @var array
      */
     protected array $availableIncludes = [
-        //
+        'finished_trade',
     ];
 
     public function transform(GameListing $gameListing): array
@@ -38,6 +40,12 @@ class GameListingTransformer extends TransformerAbstract
             'platform_id'                => $gameListing->platform_id,
             'platform'                   => (new PlatformTransformer())->transform($gameListing->platform),
             'pending_trade_offers_count' => $gameListing->pending_trade_offers_count ?? 0,
+            'has_accepted_trade_offer'   => (bool)$gameListing->has_accepted_trade_offer,
         ];
+    }
+
+    public function includeFinishedTrade(GameListing $gameListing): Item
+    {
+        return $this->item($gameListing->finished_trade, new TradeTransformer());
     }
 }
