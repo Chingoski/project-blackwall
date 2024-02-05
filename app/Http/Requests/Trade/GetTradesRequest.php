@@ -29,6 +29,7 @@ class GetTradesRequest extends FormRequest
             'owner_id'        => ['required_without:trader_user_id', 'integer', 'exists:user,id'],
             'status'          => ['integer', 'in:' . TradeStatusEnum::Pending->value . ',' . TradeStatusEnum::Accepted->value . ',' . TradeStatusEnum::Finished->value . ',' . TradeStatusEnum::Canceled->value . ',' . TradeStatusEnum::Expired->value],
             'search'          => ['string'],
+            'include'          => ['array'],
         ];
     }
 }

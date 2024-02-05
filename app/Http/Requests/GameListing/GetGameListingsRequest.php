@@ -29,6 +29,7 @@ class GetGameListingsRequest extends FormRequest
             'owner_id'         => ['integer', 'exists:user,id'],
             'city_id'          => ['integer', 'exists:city,id'],
             'order_by'         => ['string', 'in:alphabetical,chronological'],
+            'include'          => ['array'],
             'trade_preference' => ['string', 'in:' . TradePreferenceEnum::Any->value . ',' . TradePreferenceEnum::Cash->value . ',' . TradePreferenceEnum::GameTitlesOnly->value],
             'page'             => ['integer'],
             'finished'         => ['boolean'],
