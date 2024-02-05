@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\TradeStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class GameListing extends BaseModel
 {
@@ -38,5 +40,11 @@ class GameListing extends BaseModel
     public function platform(): BelongsTo
     {
         return $this->belongsTo(Platform::class, 'platform_id', 'id');
+    }
+
+    public function finished_trade(): HasOne
+    {
+        return $this->hasOne(Trade::class, 'game_listing_id', 'id')
+            ->where('trade.status', '=', TradeStatusEnum::Finished->value);
     }
 }

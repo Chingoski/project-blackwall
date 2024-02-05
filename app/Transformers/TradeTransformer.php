@@ -3,7 +3,10 @@
 namespace App\Transformers;
 
 use App\Enums\TradeStatusEnum;
+use App\Models\GameListing;
 use App\Models\Trade;
+use League\Fractal\Resource\Collection;
+use League\Fractal\Resource\Item;
 use League\Fractal\TransformerAbstract;
 
 class TradeTransformer extends TransformerAbstract
@@ -23,7 +26,8 @@ class TradeTransformer extends TransformerAbstract
      * @var array
      */
     protected array $availableIncludes = [
-        //
+        'trader',
+        'game_listing',
     ];
 
     /**
@@ -58,5 +62,15 @@ class TradeTransformer extends TransformerAbstract
         }
 
         return $response;
+    }
+
+    public function includeTrader(Trade $trade): Item
+    {
+        return $this->item($trade->trader, new UserTransformer());
+    }
+
+    public function includeGameListing(Trade $trade): Item
+    {
+        return $this->item($trade->game_listing, new GameListingTransformer());
     }
 }

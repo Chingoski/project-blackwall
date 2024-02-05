@@ -4,6 +4,8 @@ namespace App\Http\Requests\User;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class UpdateUserRequest extends FormRequest
@@ -30,7 +32,7 @@ class UpdateUserRequest extends FormRequest
             'city_id'       => ['integer', 'exists:city,id'],
             'address'       => ['string'],
             'date_of_birth' => ['date'],
-            'email'         => ['email', 'unique:user,email'],
+            'email'         => ['email', Rule::unique('user')->ignore(Auth::user()->getKey()),],
         ];
     }
 }

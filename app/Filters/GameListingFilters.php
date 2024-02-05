@@ -23,6 +23,14 @@ class GameListingFilters extends BaseFilters
                         ->where('trade.status', '=', TradeStatusEnum::Pending->value)
                         ->whereNull('trade.deleted_at');
                 },
+                'has_accepted_trade_offer'   => function (Builder $query) {
+                    $query->selectRaw('1')
+                        ->from('trade')
+                        ->whereColumn('trade.game_listing_id', 'game_listing.id')
+                        ->where('trade.status', '=', TradeStatusEnum::Accepted->value)
+                        ->whereNull('deleted_at')
+                        ->limit(1);
+                },
             ]);
 
         if (!isset($filters['owner_id'])) {
@@ -136,6 +144,21 @@ class GameListingFilters extends BaseFilters
                 ->from('trade')
                 ->whereColumn('trade.game_listing_id', 'game_listing.id')
                 ->where('trade.status', '=', TradeStatusEnum::Canceled->value)
+                ->whereNull('deleted_at');
+        });
+    }
+
+    public function ongoing(bool $finished): void
+    {
+        if (!$finished) {
+            return;
+        }
+
+        $this->builder->whereNotExists(function (Builder $query) {
+            $query->selectRaw('1')
+                ->from('trade')
+                ->whereColumn('trade.game_listing_id', 'game_listing.id')
+                ->where('trade.status', '=', TradeStatusEnum::Finished->value)
                 ->whereNull('deleted_at');
         });
     }

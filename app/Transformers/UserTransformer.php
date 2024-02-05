@@ -43,7 +43,7 @@ class UserTransformer extends TransformerAbstract
             'email'         => $user->email,
             'phone_number'  => $user->phone_number,
             'address'       => $user->address,
-            'date_of_birth' => Carbon::parse($user->date_of_birth)->format('m/d/Y'),
+            'date_of_birth' => Carbon::parse($user->date_of_birth)->format('d/m/Y'),
             'city_id'       => $user->city_id,
             'city'          => (new CityTransformer())->transform($user->city),
         ];

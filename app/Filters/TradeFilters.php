@@ -16,8 +16,8 @@ class TradeFilters extends BaseFilters
 
     public function search(string $search): void
     {
-        $this->builder->where(function (Builder $query) use ($search) {
-            $query->whereExists(function (Builder $query) use ($search) {
+        $this->builder->where(function ($query) use ($search) {
+            $query->whereExists(function ($query) use ($search) {
                 $query->selectRaw('1')
                     ->from('game')
                     ->join('offered_trade_game', 'game.id', '=', 'offered_trade_game.game_id')
@@ -36,7 +36,7 @@ class TradeFilters extends BaseFilters
     {
         $this->builder->join('game_listing', 'trade.game_listing_id', '=', 'game_listing.id')
             ->where('game_listing.owner_id', '=', $ownerId)
-            ->when($ownerId != Auth::user()->getKey(), fn(Builder $query) => $query->where('trader_user_id', '=', Auth::user()->getKey()));
+            ->when($ownerId != Auth::user()->getKey(), fn($query) => $query->where('trader_user_id', '=', Auth::user()->getKey()));
     }
 
 
